@@ -1,0 +1,68 @@
+
+cree
+CREATE TABLE post_office (    post_office_id INT PRIMARY KEY AUTO_INCREMENT,
+    area_name TEXT,    city_name TEXT,    pin_code INT,    phone_number BIGINT,    state_code CHAR(2)
+);CREATE TABLE state (    state_code CHAR(2) PRIMARY KEY,
+    state_name VARCHAR(100)
+);
+ 
+INSERT INTO state (state_code, state_name) VALUES ('TN', 'Tamil Nadu'), ('KA', 'Karnataka');INSERT INTO post_office (area_name, city_name, pin_code, phone_number, state_code) VALUES('Pethaniapuram 2, Gnana Olivupuram', 'Madurai', 625016, 9900000001, 'TN'),('Loyola College Campus, Nungambakkam', 'Chennai', 600034, 9900000002, 'TN'),('MG Road', 'Bangalore', 560001, 9900000003, 'KA');
+ 
+SELECT po.post_office_id, po.area_name, po.city_name, po.pin_code, po.phone_number, s.state_nameFROM post_office poJOIN state s ON po.state_code = s.state_code
+ 
+CREATE VIEW post_office_view ASSELECT po.post_office_id, po.area_name, po.city_name, po.pin_code, po.phone_number, s.state_nameFROM post_office poJOIN state s ON po.state_code = s.state_code;
+ 
+CREATE MATERIALIZED VIEW state_post_office_count ASSELECT state_code, COUNT(*) AS post_office_countFROM post_officeGROUP BY state_code;
+ 
+INSERT INTO post_office (area_name, city_name, pin_code, phone_number, state_code) VALUES('Pethaniapuram 4, Gnana Olivupuram', 'Madurai', 625017, 9900000004, 'TN')
+ 
+ 
+REFRESH MATERIALIZED VIEW 
+;
+ 
+CREATE PROCEDURE GetPostOfficesByState (IN state_code CHAR(2))BEGIN    SELECT *    FROM post_office    WHERE state_code = state_code;END;
+ 
+CREATE PROCEDURE GetPostOfficesByState (IN p_state_code CHAR(2))
+
+BEGIN
+
+    SELECT *
+
+    FROM post_office
+
+    WHERE state_code = p_state_code;
+
+END;
+
+ 
+[4:48 PM] Sathish Kumar Thiyagarajan (Unverified)
+CREATEOR REPLACE FUNCTION GetPostOfficesByState(state_code CHAR(2))
+RETURNSTABLE(post_office_id INT, name VARCHAR, address VARCHAR, state_code CHAR(2)) AS $$
+BEGINRETURN QUERY
+SELECT*FROM post_office
+WHERE state_code = GetPostOfficesByState.state_code;
+END;
+
+$$ LANGUAGE plpgsql;
+ 
+CREATE OR REPLACE FUNCTION public.sp_test(state_code)
+
+RETURNS SETOF refcursor
+
+LANGUAGE plpgsql
+
+AS $function$
+
+begin
+
+	select * from your_table;
+
+	return;
+
+end ;
+
+$function$
+
+;
+
+ 
